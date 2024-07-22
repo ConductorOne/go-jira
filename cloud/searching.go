@@ -13,6 +13,13 @@ type (
 	searchF func(search) search
 )
 
+func WithExpand(expand string) searchF {
+	return func(s search) search {
+		s = append(s, searchParam{name: "expand", value: expand})
+		return s
+	}
+}
+
 // WithMaxResults sets the max results to return
 func WithMaxResults(maxResults int) searchF {
 	return func(s search) search {
