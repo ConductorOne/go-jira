@@ -28,7 +28,7 @@ type Status struct {
 type StatusSearchOptions struct {
 	// StartAt: The starting index of the returned projects. Base index: 0.
 	StartAt int `url:"startAt,omitempty"`
-	// MaxResults: The maximum number of projects to return per page. Default: 50.
+	// MaxResults: The maximum number of projects to return per page. Default: 100.
 	MaxResults   int      `url:"maxResults,omitempty"`
 	Query        string   `url:"query,omitempty"`
 	ProjectIDs   []string `url:"projectIds,omitempty"`
