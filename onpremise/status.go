@@ -31,8 +31,18 @@ type StatusSearchOptions struct {
 	// MaxResults: The maximum number of projects to return per page. Default: 50.
 	MaxResults   int      `url:"maxResults,omitempty"`
 	Query        string   `url:"query,omitempty"`
-	ProjectIds   []string `url:"projectIds,omitempty"`
-	IssueTypeIds []string `url:"issueTypeIds,omitempty"`
+	ProjectIDs   []string `url:"projectIds,omitempty"`
+	IssueTypeIDs []string `url:"issueTypeIds,omitempty"`
+}
+
+type DatacenterStatus struct {
+	Self       string   `json:"self" structs:"self"`
+	NextPage   string   `json:"nextPage" structs:"nextPage"`
+	MaxResults int      `json:"maxResults" structs:"maxResults"`
+	StartAt    int      `json:"startAt" structs:"startAt"`
+	Total      int      `json:"total" structs:"total"`
+	IsLast     bool     `json:"isLast" structs:"isLast"`
+	Values     []Status `json:"values" structs:"values"`
 }
 
 // GetAllStatuses returns a list of all statuses associated with workflows.
@@ -74,11 +84,11 @@ func (s *StatusService) GetStatusesPaginated(ctx context.Context, options *Statu
 		if options.Query != "" {
 			uv.Add("query", options.Query)
 		}
-		if len(options.ProjectIds) > 0 {
-			uv.Add("projectIds", strings.Join(options.ProjectIds, ","))
+		if len(options.ProjectIDs) > 0 {
+			uv.Add("projectIds", strings.Join(options.ProjectIDs, ","))
 		}
-		if len(options.IssueTypeIds) > 0 {
-			uv.Add("issueTypeIds", strings.Join(options.IssueTypeIds, ","))
+		if len(options.IssueTypeIDs) > 0 {
+			uv.Add("issueTypeIds", strings.Join(options.IssueTypeIDs, ","))
 		}
 	}
 
@@ -89,11 +99,11 @@ func (s *StatusService) GetStatusesPaginated(ctx context.Context, options *Statu
 		return nil, nil, err
 	}
 
-	statusList := []Status{}
+	statusList := DatacenterStatus{}
 	resp, err := s.client.Do(req, &statusList)
 	if err != nil {
 		return nil, resp, NewJiraError(resp, err)
 	}
 
-	return statusList, resp, nil
+	return statusList.Values, resp, nil
 }
