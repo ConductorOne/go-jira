@@ -175,6 +175,23 @@ func (s *ProjectService) GetPermissionScheme(ctx context.Context, projectID stri
 	return ps, resp, nil
 }
 
+func (s *ProjectService) GetProjectStatuses(ctx context.Context, projectID string) ([]Status, *Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/api/2/project/%s/statuses", projectID)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	statusList := []Status{}
+	resp, err := s.client.Do(req, &statusList)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return nil, resp, jerr
+	}
+
+	return statusList, resp, nil
+}
+
 // Find searches for project paginated info from Jira
 //
 // Jira API docs: https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-projects/#api-rest-api-2-project-search-get
