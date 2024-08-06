@@ -32,6 +32,19 @@ type CreateMetaIssueType struct {
 	Values     []*MetaDataFields `json:"values,omitempty"`
 }
 
+// https://developer.atlassian.com/platform/forge/manifest-reference/modules/jira-custom-field-type/#data-types
+const (
+	TypeString   = "string"
+	TypeArray    = "array"
+	TypeDate     = "date"
+	TypeDateTime = "datetime"
+	TypeNumber   = "number"
+	TypeUser     = "user"
+	TypeGroup    = "group"
+	TypeObject   = "object"
+	TypeOption   = "option"
+)
+
 // MetaDataFields is for tcontainer.MarshalMap in MetaIssueType but used specifically in baton-jira/datacenter
 type MetaDataFields struct {
 	Required        bool     `json:"required"`
