@@ -549,6 +549,11 @@ type GetQueryOptions struct {
 	ProjectKeys   string `url:"projectKeys,omitempty"`
 }
 
+type GetQueryIssueTypeOptions struct {
+	MaxResults int `url:"maxResults,omitempty"`
+	StartAt    int `url:"startAt,omitempty"`
+}
+
 // GetWorklogsQueryOptions specifies the optional parameters for the Get Worklogs method
 type GetWorklogsQueryOptions struct {
 	StartAt      int64  `url:"startAt,omitempty"`
