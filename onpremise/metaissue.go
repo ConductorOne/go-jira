@@ -132,7 +132,7 @@ func (s *IssueService) GetCreateMeta(ctx context.Context, options *GetQueryOptio
 }
 
 func (s *IssueService) GetCreateMetaProjectIssueTypes(ctx context.Context, projectKey string, options *GetQueryIssueTypeOptions) ([]*MetaIssueType, *Response, error) {
-	apiEndpoint := fmt.Sprintf("/api/2/issue/createmeta/%s/issuetypes", projectKey)
+	apiEndpoint := fmt.Sprintf("rest/api/2/issue/createmeta/%s/issuetypes", projectKey)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, apiEndpoint, nil)
 	if err != nil {
@@ -157,7 +157,7 @@ func (s *IssueService) GetCreateMetaProjectIssueTypes(ctx context.Context, proje
 }
 
 func (s *IssueService) GetCreateMetaIssueType(ctx context.Context, projectKey, issueTypeId string, options *GetQueryIssueTypeOptions) ([]*MetaDataFields, *Response, error) {
-	apiEndpoint := fmt.Sprintf("/api/2/issue/createmeta/%s/issuetypes/%s", projectKey, issueTypeId)
+	apiEndpoint := fmt.Sprintf("rest/api/2/issue/createmeta/%s/issuetypes/%s", projectKey, issueTypeId)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, apiEndpoint, nil)
 	if err != nil {
