@@ -50,7 +50,7 @@ type MetaDataFields struct {
 	Required        bool     `json:"required"`
 	Schema          Schema   `json:"schema"`
 	Name            string   `json:"name"`
-	Key             string   `json:"key"`
+	FieldId         string   `json:"fieldId"`
 	HasDefaultValue bool     `json:"hasDefaultValue"`
 	AllowedValues   []Choice `json:"allowedValues,omitempty"`
 }
