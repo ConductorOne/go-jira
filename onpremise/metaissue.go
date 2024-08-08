@@ -16,6 +16,59 @@ type CreateMetaInfo struct {
 	Projects []*MetaProject `json:"projects,omitempty"`
 }
 
+type CreateMetaProjectIssueTypeInfo struct {
+	MaxResults int              `json:"maxResults,omitempty"`
+	StartAt    int              `json:"startAt,omitempty"`
+	Total      int              `json:"total,omitempty"`
+	IsLast     bool             `json:"isLast,omitempty"`
+	Values     []*MetaIssueType `json:"values,omitempty"`
+}
+
+type CreateMetaIssueType struct {
+	MaxResults int               `json:"maxResults,omitempty"`
+	StartAt    int               `json:"startAt,omitempty"`
+	Total      int               `json:"total,omitempty"`
+	IsLast     bool              `json:"isLast,omitempty"`
+	Values     []*MetaDataFields `json:"values,omitempty"`
+}
+
+// https://developer.atlassian.com/platform/forge/manifest-reference/modules/jira-custom-field-type/#data-types
+const (
+	TypeString   = "string"
+	TypeArray    = "array"
+	TypeDate     = "date"
+	TypeDateTime = "datetime"
+	TypeNumber   = "number"
+	TypeUser     = "user"
+	TypeGroup    = "group"
+	TypeObject   = "object"
+	TypeOption   = "option"
+)
+
+// MetaDataFields is for tcontainer.MarshalMap in MetaIssueType but used specifically in baton-jira/datacenter
+type MetaDataFields struct {
+	Required        bool     `json:"required"`
+	Schema          Schema   `json:"schema"`
+	Name            string   `json:"name"`
+	FieldId         string   `json:"fieldId"`
+	HasDefaultValue bool     `json:"hasDefaultValue"`
+	AllowedValues   []Choice `json:"allowedValues,omitempty"`
+}
+
+type Choice struct {
+	Id string `json:"id"`
+	// Could be name or value in most cases
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+
+type Schema struct {
+	Type     string `json:"type"`
+	Custom   string `json:"custom"`
+	CustomId int    `json:"customId"`
+	Items    string `json:"items,omitempty"`
+}
+
 // EditMetaInfo contains information about fields and their attributed to edit a ticket.
 type EditMetaInfo struct {
 	Fields tcontainer.MarshalMap `json:"fields,omitempty"`
@@ -76,6 +129,56 @@ func (s *IssueService) GetCreateMeta(ctx context.Context, options *GetQueryOptio
 	}
 
 	return meta, resp, nil
+}
+
+func (s *IssueService) GetCreateMetaProjectIssueTypes(ctx context.Context, projectKey string, options *GetQueryIssueTypeOptions) ([]*MetaIssueType, *Response, bool, error) {
+	apiEndpoint := fmt.Sprintf("rest/api/2/issue/createmeta/%s/issuetypes", projectKey)
+
+	req, err := s.client.NewRequest(ctx, http.MethodGet, apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, false, err
+	}
+
+	if options != nil {
+		q, err := query.Values(options)
+		if err != nil {
+			return nil, nil, false, err
+		}
+		req.URL.RawQuery = q.Encode()
+	}
+
+	meta := new(CreateMetaProjectIssueTypeInfo)
+	resp, err := s.client.Do(req, meta)
+	if err != nil {
+		return nil, resp, false, err
+	}
+
+	return meta.Values, resp, meta.IsLast, nil
+}
+
+func (s *IssueService) GetCreateMetaIssueType(ctx context.Context, projectKey, issueTypeId string, options *GetQueryIssueTypeOptions) ([]*MetaDataFields, *Response, bool, error) {
+	apiEndpoint := fmt.Sprintf("rest/api/2/issue/createmeta/%s/issuetypes/%s", projectKey, issueTypeId)
+
+	req, err := s.client.NewRequest(ctx, http.MethodGet, apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, false, err
+	}
+
+	if options != nil {
+		q, err := query.Values(options)
+		if err != nil {
+			return nil, nil, false, err
+		}
+		req.URL.RawQuery = q.Encode()
+	}
+
+	meta := new(CreateMetaIssueType)
+	resp, err := s.client.Do(req, meta)
+	if err != nil {
+		return nil, resp, false, err
+	}
+
+	return meta.Values, resp, meta.IsLast, nil
 }
 
 // GetEditMeta makes the api call to get the edit meta information for an issue
