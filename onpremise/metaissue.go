@@ -131,18 +131,18 @@ func (s *IssueService) GetCreateMeta(ctx context.Context, options *GetQueryOptio
 	return meta, resp, nil
 }
 
-func (s *IssueService) GetCreateMetaProjectIssueTypes(ctx context.Context, projectKey string, options *GetQueryIssueTypeOptions) ([]*MetaIssueType, *Response, error) {
+func (s *IssueService) GetCreateMetaProjectIssueTypes(ctx context.Context, projectKey string, options *GetQueryIssueTypeOptions) ([]*MetaIssueType, *Response, bool, error) {
 	apiEndpoint := fmt.Sprintf("rest/api/2/issue/createmeta/%s/issuetypes", projectKey)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, apiEndpoint, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, false, err
 	}
 
 	if options != nil {
 		q, err := query.Values(options)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, false, err
 		}
 		req.URL.RawQuery = q.Encode()
 	}
@@ -150,24 +150,24 @@ func (s *IssueService) GetCreateMetaProjectIssueTypes(ctx context.Context, proje
 	meta := new(CreateMetaProjectIssueTypeInfo)
 	resp, err := s.client.Do(req, meta)
 	if err != nil {
-		return nil, resp, err
+		return nil, resp, false, err
 	}
 
-	return meta.Values, resp, nil
+	return meta.Values, resp, meta.IsLast, nil
 }
 
-func (s *IssueService) GetCreateMetaIssueType(ctx context.Context, projectKey, issueTypeId string, options *GetQueryIssueTypeOptions) ([]*MetaDataFields, *Response, error) {
+func (s *IssueService) GetCreateMetaIssueType(ctx context.Context, projectKey, issueTypeId string, options *GetQueryIssueTypeOptions) ([]*MetaDataFields, *Response, bool, error) {
 	apiEndpoint := fmt.Sprintf("rest/api/2/issue/createmeta/%s/issuetypes/%s", projectKey, issueTypeId)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, apiEndpoint, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, false, err
 	}
 
 	if options != nil {
 		q, err := query.Values(options)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, false, err
 		}
 		req.URL.RawQuery = q.Encode()
 	}
@@ -175,11 +175,10 @@ func (s *IssueService) GetCreateMetaIssueType(ctx context.Context, projectKey, i
 	meta := new(CreateMetaIssueType)
 	resp, err := s.client.Do(req, meta)
 	if err != nil {
-		return nil, resp, err
+		return nil, resp, false, err
 	}
 
-	return meta.Values, resp, nil
-
+	return meta.Values, resp, meta.IsLast, nil
 }
 
 // GetEditMeta makes the api call to get the edit meta information for an issue
