@@ -80,6 +80,24 @@ func TestGroupService_Add(t *testing.T) {
 	}
 }
 
+func TestGroupService_AddById(t *testing.T) {
+	setup()
+	defer teardown()
+	testMux.HandleFunc("/rest/api/3/group/user", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodPost)
+		testRequestURL(t, r, "/rest/api/3/group/user?groupId=foo1-bar2")
+
+		w.WriteHeader(http.StatusCreated)
+		fmt.Fprint(w, `{"name":"default","self":"http://www.example.com/jira/rest/api/2/group?groupId=foo1-bar2","users":{"size":1,"items":[],"max-results":50,"start-index":0,"end-index":0},"expand":"users"}`)
+	})
+
+	if group, _, err := testClient.Group.AddUserByGroupId(context.Background(), "foo1-bar2", "5b10ac8d82e05b22cc7d4ef5"); err != nil {
+		t.Errorf("Error given: %s", err)
+	} else if group == nil {
+		t.Error("Expected group. Group is nil")
+	}
+}
+
 func TestGroupService_Remove(t *testing.T) {
 	setup()
 	defer teardown()
@@ -92,6 +110,22 @@ func TestGroupService_Remove(t *testing.T) {
 	})
 
 	if _, err := testClient.Group.RemoveUserByGroupName(context.Background(), "default", "5b10ac8d82e05b22cc7d4ef5"); err != nil {
+		t.Errorf("Error given: %s", err)
+	}
+}
+
+func TestGroupService_RemoveById(t *testing.T) {
+	setup()
+	defer teardown()
+	testMux.HandleFunc("/rest/api/3/group/user", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, http.MethodDelete)
+		testRequestURL(t, r, "/rest/api/3/group/user?groupId=foo1-bar2")
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, `{"name":"default","self":"http://www.example.com/jira/rest/api/2/group?groupId=foo1-bar2","users":{"size":1,"items":[],"max-results":50,"start-index":0,"end-index":0},"expand":"users"}`)
+	})
+
+	if _, err := testClient.Group.RemoveUserByGroupId(context.Background(), "foo1-bar2", "5b10ac8d82e05b22cc7d4ef5"); err != nil {
 		t.Errorf("Error given: %s", err)
 	}
 }
