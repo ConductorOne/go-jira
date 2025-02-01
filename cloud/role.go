@@ -13,11 +13,21 @@ type RoleService service
 
 // Role represents a Jira product role
 type Role struct {
-	Self        string   `json:"self" structs:"self"`
-	Name        string   `json:"name" structs:"name"`
-	ID          int      `json:"id" structs:"id"`
-	Description string   `json:"description" structs:"description"`
-	Actors      []*Actor `json:"actors" structs:"actors"`
+	Self        string     `json:"self" structs:"self"`
+	Name        string     `json:"name" structs:"name"`
+	ID          int        `json:"id" structs:"id"`
+	Description string     `json:"description" structs:"description"`
+	Actors      []*Actor   `json:"actors" structs:"actors"`
+	Scope       *RoleScope `json:"scope" structs:"scope"`
+}
+
+type RoleScope struct {
+	Type    string            `json:"type" structs:"type"`
+	Project *RoleScopeProject `json:"project" structs:"project"`
+}
+
+type RoleScopeProject struct {
+	ID string `json:"id" structs:"id"`
 }
 
 // Actor represents a Jira actor
