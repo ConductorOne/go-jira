@@ -52,6 +52,11 @@ type ActorGroup struct {
 	Name        string `json:"name" structs:"name"`
 }
 
+type ActorAdd struct {
+	Users  []string `json:"user"`
+	Groups []string `json:"groupId"`
+}
+
 // GetList returns a list of all available project roles
 //
 // Jira API docs: https://developer.atlassian.com/cloud/jira/platform/rest/v3/#api-api-3-role-get
@@ -114,4 +119,85 @@ func (s *RoleService) GetRoleActorsForProject(ctx context.Context, projectID str
 		return nil, resp, jerr
 	}
 	return role.Actors, resp, err
+}
+
+func (s *RoleService) AddUserToRole(ctx context.Context, projectID string, roleID int, userID string) (*Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/api/3/project/%s/role/%d", projectID, roleID)
+
+	actorModify := ActorAdd{
+		Users: []string{userID},
+	}
+
+	req, err := s.client.NewRequest(ctx, http.MethodPost, apiEndpoint, actorModify)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return resp, jerr
+	}
+
+	return resp, nil
+}
+
+func (s *RoleService) RemoveUserFromRole(ctx context.Context, projectID string, roleID int, userID string) (*Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/api/3/project/%s/role/%d", projectID, roleID)
+
+	apiEndpoint += "?user=" + userID
+
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, apiEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return resp, jerr
+	}
+
+	return resp, nil
+}
+
+func (s *RoleService) AddGroupToRole(ctx context.Context, projectID string, roleID int, groupID string) ([]*Actor, *Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/api/3/project/%s/role/%d", projectID, roleID)
+
+	actorModify := ActorAdd{
+		Groups: []string{groupID},
+	}
+
+	req, err := s.client.NewRequest(ctx, http.MethodPost, apiEndpoint, actorModify)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var actors []*Actor
+	resp, err := s.client.Do(req, actors)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return nil, resp, jerr
+	}
+
+	return actors, resp, nil
+}
+
+func (s *RoleService) RemoveGroupFromRole(ctx context.Context, projectID string, roleID int, groupID string) (*Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/api/3/project/%s/role/%d", projectID, roleID)
+
+	apiEndpoint += "?group=" + groupID
+
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, apiEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return resp, jerr
+	}
+
+	return resp, nil
 }
