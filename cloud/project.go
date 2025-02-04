@@ -175,10 +175,12 @@ func (s *ProjectService) GetPermissionScheme(ctx context.Context, projectID stri
 	return ps, resp, nil
 }
 
-// WithKey sets the key to search
-func WithKey(key string) searchF {
+// WithKeys sets the keys to search
+func WithKeys(keys ...string) searchF {
 	return func(s search) search {
-		s = append(s, searchParam{name: "key", value: key})
+		for _, key := range keys {
+			s = append(s, searchParam{name: "key", value: key})
+		}
 		return s
 	}
 }
