@@ -12,7 +12,7 @@
 
 **v2 of this library is in development.**
 **v2 will contain breaking changes :warning:**
-**The current main branch can contains the development version of v2.**
+**The current main branch contains the development version of v2.**
 
 The goals of v2 are:
 
@@ -106,7 +106,7 @@ A more thorough, [runnable example](cloud/examples/basic_auth/main.go) is provid
 func main() {
 	tp := jira.BasicAuthTransport{
 		Username: "<username>",
-		APIToken: "<api-token>",
+		Password: "<api-token>",
 	}
 
 	client, err := jira.NewClient(tp.Client(), "https://my.jira.com")
