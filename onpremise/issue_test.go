@@ -191,7 +191,7 @@ func TestIssueService_AddComment(t *testing.T) {
 
 	c := &Comment{
 		Body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
-		Visibility: CommentVisibility{
+		Visibility: &CommentVisibility{
 			Type:  "role",
 			Value: "Administrators",
 		},
@@ -219,7 +219,7 @@ func TestIssueService_UpdateComment(t *testing.T) {
 	c := &Comment{
 		ID:   "10001",
 		Body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
-		Visibility: CommentVisibility{
+		Visibility: &CommentVisibility{
 			Type:  "role",
 			Value: "Administrators",
 		},
@@ -316,7 +316,7 @@ func TestIssueService_AddLink(t *testing.T) {
 		},
 		Comment: &Comment{
 			Body: "Linked related issue!",
-			Visibility: CommentVisibility{
+			Visibility: &CommentVisibility{
 				Type:  "group",
 				Value: "jira-software-users",
 			},
@@ -1475,7 +1475,7 @@ func TestIssueService_GetWorklogs(t *testing.T) {
 		uri      string
 		worklog  *Worklog
 		err      error
-		option   *AddWorklogQueryOptions
+		option   *GetWorklogsQueryOptions
 	}{
 		{
 			name:     "simple worklog",
@@ -1550,17 +1550,26 @@ func TestIssueService_GetWorklogs(t *testing.T) {
 					},
 				},
 			},
-			option: &AddWorklogQueryOptions{Expand: "properties"},
+			option: &GetWorklogsQueryOptions{Expand: "properties"},
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			uri := fmt.Sprintf(tc.uri, tc.issueId)
+			// At some point Go updated handleFunc's pattern to ignore query params. So check the uri in the handler and return the correct response.
 			testMux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 				testMethod(t, r, http.MethodGet)
 				testRequestURL(t, r, uri)
-				_, _ = fmt.Fprint(w, tc.response)
+
+				resp := tc.response
+				for _, testCase := range tt {
+					tcUri := fmt.Sprintf(testCase.uri, testCase.issueId)
+					if tcUri == r.URL.String() {
+						resp = testCase.response
+					}
+				}
+				_, _ = fmt.Fprint(w, resp)
 			})
 
 			var worklog *Worklog

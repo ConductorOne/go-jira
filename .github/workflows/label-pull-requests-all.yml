@@ -1,0 +1,50 @@
+# This workflow is a "one off" workflow.
+# It re-iterates over all pull requests and labels them.
+# This is useful if you have added new labels and want to apply them to all existing pull requests.
+name: Label pull requests (all)
+
+on:
+  workflow_dispatch:
+
+# limit permissions
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          sync-labels: false
+          # Output of gh pr list --repo andygrunwald/go-jira --state open --limit 100 --json number --jq ".[].number"
+          pr-number: |
+            695
+            683
+            682
+            679
+            676
+            670
+            658
+            655
+            648
+            646
+            640
+            637
+            635
+            630
+            626
+            611
+            595
+            499
+            471
+            465
+            461
+            431
+            425
+            398
+            372
+            369
+            300
