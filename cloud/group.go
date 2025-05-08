@@ -97,24 +97,6 @@ type APIError struct {
 	Errors        map[string]string `json:"errors"`
 }
 
-func (e *APIError) Message() string {
-	if len(e.ErrorMessages) > 0 {
-		return fmt.Sprintf("jira API errors: %v", e.ErrorMessages)
-	}
-	if len(e.Errors) > 0 {
-		var combined string
-		for field, msg := range e.Errors {
-			combined += fmt.Sprintf("%s (field: %s); ", msg, field)
-		}
-		return combined
-	}
-	return "unknown error from Jira API (no error messages returned)"
-}
-
-func (e *APIError) Error() string {
-	return e.Message()
-}
-
 // Get returns a paginated list of members of the specified group and its subgroups.
 // Users in the page are ordered by user names.
 // User of this resource is required to have sysadmin or admin permissions.
