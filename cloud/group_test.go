@@ -107,8 +107,12 @@ func TestGroupService_Remove(t *testing.T) {
 		fmt.Fprint(w, `{"name":"default","self":"http://www.example.com/jira/rest/api/2/group?groupname=default","users":{"size":1,"items":[],"max-results":50,"start-index":0,"end-index":0},"expand":"users"}`)
 	})
 
-	if _, err := testClient.Group.RemoveUserByGroupName(context.Background(), "default", "5b10ac8d82e05b22cc7d4ef5"); err != nil {
+	resp, err := testClient.Group.RemoveUserByGroupName(context.Background(), "default", "5b10ac8d82e05b22cc7d4ef5")
+	if err != nil {
 		t.Errorf("Error given: %s", err)
+	}
+	if resp == nil {
+		t.Error("Expected group. Group is nil")
 	}
 }
 
