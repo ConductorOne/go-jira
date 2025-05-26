@@ -70,23 +70,12 @@ type AuditOptions struct {
 	From   string `url:"from,omitempty"`
 	Offset int    `url:"offset,omitempty"`
 	Limit  int    `url:"limit,omitempty"`
+	Filter string `url:"filter,omitempty"`
 }
 
-func (s *AuditService) Get(ctx context.Context, from time.Time, offset int, limit int) (*AuditResponse, *Response, error) {
+func (s *AuditService) Get(ctx context.Context, opts *AuditOptions) (*AuditResponse, *Response, error) {
 	apiEndpoint := "/rest/api/3/auditing/record"
-
-	options := &AuditOptions{}
-	if !from.IsZero() {
-		options.From = from.Format(time.RFC3339)
-	}
-	if offset > 0 {
-		options.Offset = offset
-	}
-	if limit > 0 {
-		options.Limit = limit
-	}
-
-	urlWithParams, err := addOptions(apiEndpoint, options)
+	urlWithParams, err := addOptions(apiEndpoint, opts)
 	if err != nil {
 		return nil, nil, err
 	}
