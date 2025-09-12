@@ -36,6 +36,21 @@ type UpdateQueryOptions struct {
 	OverrideEditableFlag   bool `url:"overrideEditableFlag,omitempty"`
 }
 
+type BulkIssueRequest struct {
+	Issues []*Issue `json:"issueUpdate,omitempty" structs:"issueUpdate,omitempty"`
+}
+
+type BulkOperationErrorResult struct {
+	ErrorMessages []string `json:"errorMessages" structs:"errorMessages,omitempty"`
+	Errors        string   `json:"errors" structs:"errors,omitempty"`
+	IssueStatus   int      `json:"status,omitempty" structs:"status,omitempty"`
+}
+
+type BulkIssueResponse struct {
+	Issues []*Issue                    `json:"issueUpdate,omitempty" structs:"issueUpdate,omitempty"`
+	Errors []*BulkOperationErrorResult `json:"errors,omitempty" structs:"errors,omitempty"`
+}
+
 // Issue represents a Jira issue.
 type Issue struct {
 	Expand         string               `json:"expand,omitempty" structs:"expand,omitempty"`
@@ -835,6 +850,29 @@ func (s *IssueService) Create(ctx context.Context, issue *Issue) (*Issue, *Respo
 	}
 
 	return responseIssue, resp, nil
+}
+
+func (s *IssueService) BulkCreate(ctx context.Context, issues *BulkIssueRequest) (*BulkIssueResponse, *Response, error) {
+	apiEndpoint := "rest/api/2/issue/bulk"
+	req, err := s.client.NewRequest(ctx, http.MethodPost, apiEndpoint, issues)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		// incase of error return the resp for further inspection
+		return nil, resp, err
+	}
+	defer resp.Body.Close()
+
+	responseBulkIssue := new(BulkIssueResponse)
+	err = json.NewDecoder(resp.Body).Decode(&responseBulkIssue)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return responseBulkIssue, resp, nil
 }
 
 // Update updates an issue from a JSON representation,
