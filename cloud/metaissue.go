@@ -54,7 +54,7 @@ type MetaDataFields struct {
 }
 
 // The Jira API can be inconsistent with the response type for id
-// It can return eother a string or number
+// It can return either a string or number
 type ChoiceId string
 
 func (s *ChoiceId) UnmarshalJSON(b []byte) error {
